@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>わんカフェわんランマップ</title>
-<meta name="description" content="全国のドッグラン・ドッグカフェを地図で探して、わんちゃんの写真・動画を見られるマップ">
+<meta name="description" content="看板犬のいるドッグカフェ・ドッグランを地図で探して、看板犬の写真・動画を見られるマップ（大阪・兵庫・京都・奈良）">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
@@ -92,6 +92,17 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
 .s-yt{background:#e62117}
 .s-gg{background:#4f7fd8}
 .hint{font-size:12px;color:var(--sub);line-height:1.6;margin-top:10px}
+.dogs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px}
+.dogs .dl{font-size:12px;font-weight:800;color:#fff;background:var(--accent);border-radius:8px;padding:3px 8px}
+.dog{background:var(--bg);border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;font-size:15px}
+.dog small{margin-left:6px;color:var(--sub);font-size:12px}
+.bigig{display:block;text-align:center;text-decoration:none;color:#fff;font-weight:700;border-radius:12px;padding:12px;margin:4px 0 14px;background:linear-gradient(45deg,#f09433,#dc2743 55%,#bc1888)}
+.xp{margin-bottom:14px}
+.more{margin-top:8px;border-top:1px solid var(--line);padding-top:10px}
+.more summary{cursor:pointer;font-weight:700;font-size:14px;margin-bottom:10px}
+.src{font-size:11.5px;color:var(--sub);margin-top:14px;word-break:break-all}
+.src a{color:var(--sub)}
+.pin .badge{font-size:9.5px;right:-12px}
 .meta{font-size:13px;color:var(--sub);margin:-6px 0 14px}
 
 @media (max-width:760px){
@@ -115,23 +126,22 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
 </style>
 </head>
 <body>
-<div id="map" role="application" aria-label="ドッグラン・ドッグカフェの地図"></div>
+<div id="map" role="application" aria-label="看板犬のいるドッグカフェ・ドッグランの地図"></div>
 
 <div id="top">
   <div class="bar">
     <div class="row1">
       <div class="logo">🐾<span> わんカフェわんランマップ</span></div>
       <div class="search">
-        <input id="q" type="search" placeholder="施設名・地名で探す（例：京都、グランドロック）" autocomplete="off" aria-label="施設名・地名で探す">
+        <input id="q" type="search" placeholder="お店・地名・看板犬の名前で探す" autocomplete="off" aria-label="お店・地名・看板犬の名前で探す">
         <div id="results" role="listbox"></div>
       </div>
       <button class="iconbtn" id="locate" title="現在地を表示" aria-label="現在地を表示">📍</button>
       <button class="iconbtn" id="info" title="このアプリについて" aria-label="このアプリについて">ⓘ</button>
     </div>
     <div class="chips">
-      <button class="chip run" data-f="run" aria-pressed="true">🐕 ドッグラン</button>
       <button class="chip cafe" data-f="cafe" aria-pressed="true">☕ ドッグカフェ</button>
-      <button class="chip feat" data-f="feat" aria-pressed="false">⭐ 写真・動画あり</button>
+      <button class="chip run" data-f="run" aria-pressed="true">🐕 ドッグラン</button>
       <span class="count" id="count"></span>
     </div>
   </div>
@@ -142,18 +152,17 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
 <div id="about" role="dialog" aria-modal="true" aria-label="このアプリについて">
   <div class="box">
     <h2>🐾 わんカフェわんランマップについて</h2>
+    <p style="margin:0 0 6px">大阪・兵庫・京都・奈良の、<b>看板犬のいる</b>ドッグカフェとドッグランを集めた地図です。</p>
     <div class="legend">
+      <span><i class="dot" style="background:var(--cafe)"></i>ドッグカフェ</span>
       <span><i class="dot" style="background:var(--run)"></i>ドッグラン</span>
-      <span><i class="dot" style="background:var(--cafe)"></i>ドッグカフェ・犬連れOKカフェ</span>
-      <span><i class="dot" style="background:var(--star)"></i>⭐ アプリ内で写真・動画が見られる施設</span>
     </div>
     <ul>
-      <li>目印をタップすると、その施設の情報と、わんちゃんの写真・動画が表示されます。</li>
-      <li>⭐の施設（大阪・兵庫・京都・奈良の一部）は、YouTube・Instagramの公開投稿を各サービス公式の埋め込み機能で表示しています。投稿の著作権は投稿者に帰属します。</li>
-      <li>その他の施設は「Instagramで見る」などのボタンから、最新の写真・動画を探せます。</li>
-      <li>施設の場所は OpenStreetMap（みんなで作る地図）の登録情報をもとにしています。登録漏れや、閉店・移転の反映漏れがありえます。お出かけ前に公式情報で営業日・利用条件をご確認ください。</li>
+      <li>目印をタップすると、そのお店の看板犬の写真・動画がすぐに表示されます。</li>
+      <li>写真・動画は、お店や飼い主の方がInstagram・YouTube・Xに公開している投稿を、各サービス公式の埋め込み機能で表示しています。投稿の著作権は投稿者に帰属します。投稿が削除されると表示されなくなります。</li>
+      <li>看板犬やお店の情報は調査時点のものです。お出かけ前に、公式情報で営業日・利用条件をご確認ください。</li>
     </ul>
-    <p style="font-size:12px;color:var(--sub)">出典：地図 国土地理院（淡色地図）／施設データ © OpenStreetMap contributors（ODbL）／住所表示 国土地理院 逆ジオコーダ</p>
+    <p style="font-size:12px;color:var(--sub)">出典：地図 国土地理院（淡色地図）／位置 国土地理院 住所検索／お店・看板犬の情報 独自調査（各お店の公式情報など）</p>
     <button class="chip" id="aboutClose" style="margin-top:6px">閉じる</button>
   </div>
 </div>
@@ -166,22 +175,23 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
   const SPOTS = window.SPOTS || [];
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const dogText = s => (s.dogs||[]).map(d => d.name + (d.breed ? `（${d.breed}）` : "")).join("・");
 
-  // ---- 地図 ----
-  const map = L.map("map", {zoomControl:false, minZoom:5, maxZoom:18}).setView([36.2, 137.8], 6);
+  // ---- 地図（お店のある範囲＝関西を表示） ----
+  const map = L.map("map", {zoomControl:false, minZoom:6, maxZoom:18});
   L.control.zoom({position:"bottomleft"}).addTo(map);
   L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", {
     maxZoom:18,
-    attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a> | © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+    attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a>'
   }).addTo(map);
+  if (SPOTS.length) map.fitBounds(L.latLngBounds(SPOTS.map(s => [s.lat, s.lng])).pad(.08), {paddingTopLeft:[0, 110]});
+  else map.setView([34.75, 135.45], 9);
 
   const cluster = L.markerClusterGroup({
-    showCoverageOnHover:false, maxClusterRadius:48, spiderfyOnMaxZoom:true,
+    showCoverageOnHover:false, maxClusterRadius:40, spiderfyOnMaxZoom:true, disableClusteringAtZoom:15,
     iconCreateFunction(c){
-      const n = c.getChildCount();
-      const feat = c.getAllChildMarkers().some(m => m.spot.feat);
-      const size = n < 10 ? 38 : n < 50 ? 46 : 54;
-      return L.divIcon({html:`<div class="cl${feat?" hasfeat":""}" style="width:${size}px;height:${size}px">${feat?"⭐":""}${n}</div>`, className:"", iconSize:[size,size]});
+      const n = c.getChildCount(), size = n < 10 ? 44 : 52;
+      return L.divIcon({html:`<div class="cl" style="width:${size}px;height:${size}px">🐶${n}</div>`, className:"", iconSize:[size,size]});
     }
   });
   map.addLayer(cluster);
@@ -190,47 +200,42 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
     const run = s.t === "dogrun";
     return L.divIcon({
       className:"",
-      html:`<div class="pin ${run?"run":"cafe"}${s.feat?" feat":""}"><div class="body"></div><div class="emo">${run?"🐕":"☕"}</div>${s.feat?'<div class="badge">⭐動画</div>':""}</div>`,
+      html:`<div class="pin ${run?"run":"cafe"}"><div class="body"></div><div class="emo">🐶</div><div class="badge">${run?"ラン":"カフェ"}</div></div>`,
       iconSize:[38,46], iconAnchor:[19,44], tooltipAnchor:[0,-40]
     });
   }
 
   const markers = SPOTS.map(s => {
-    const m = L.marker([s.lat, s.lng], {icon:icon(s), title:s.n, zIndexOffset:s.feat?1000:0});
+    const m = L.marker([s.lat, s.lng], {icon:icon(s), title:s.n});
     m.spot = s;
-    m.bindTooltip(esc(s.n), {direction:"top"});
+    m.bindTooltip(`${esc(s.n)}${s.dogs&&s.dogs.length?`<br>🐶 ${esc(s.dogs.map(d=>d.name).join("・"))}`:""}`, {direction:"top"});
     m.on("click", () => open(s));
     return m;
   });
 
   // ---- 絞り込み ----
-  const filt = {run:true, cafe:true, feat:false};
-  function visible(s){
-    if (filt.feat && !s.feat) return false;
-    return s.t === "dogrun" ? filt.run : filt.cafe;
-  }
+  const filt = {run:true, cafe:true};
+  const visible = s => s.t === "dogrun" ? filt.run : filt.cafe;
   function refresh(){
     cluster.clearLayers();
     const v = markers.filter(m => visible(m.spot));
     cluster.addLayers(v);
-    $("#count").textContent = `${v.length}件を表示中`;
+    $("#count").textContent = `看板犬のいるお店 ${v.length}件`;
   }
   document.querySelectorAll(".chip[data-f]").forEach(b => b.addEventListener("click", () => {
     const k = b.dataset.f; filt[k] = !filt[k]; b.setAttribute("aria-pressed", filt[k]); refresh();
-    if (k === "feat" && filt.feat) map.flyToBounds(L.latLngBounds(SPOTS.filter(s=>s.feat).map(s=>[s.lat,s.lng])).pad(.2));
   }));
   refresh();
 
-  // ---- 検索 ----
+  // ---- 検索（お店の名前・住所・看板犬の名前） ----
   const q = $("#q"), res = $("#results");
   const norm = s => String(s||"").normalize("NFKC").toLowerCase();
   q.addEventListener("input", () => {
     const w = norm(q.value).trim();
     if (!w){ res.style.display = "none"; return; }
-    const hit = SPOTS.filter(s => norm(s.n + " " + (s.a||"")).includes(w))
-      .sort((a,b) => (b.feat||0)-(a.feat||0)).slice(0, 30);
-    res.innerHTML = hit.length ? hit.map((s,i) =>
-      `<button data-i="${SPOTS.indexOf(s)}">${s.t==="dogrun"?"🐕":"☕"} ${s.feat?"⭐ ":""}${esc(s.n)}<small>${esc(s.a||"")}</small></button>`).join("")
+    const hit = SPOTS.filter(s => norm(`${s.n} ${s.a||""} ${dogText(s)}`).includes(w)).slice(0, 30);
+    res.innerHTML = hit.length ? hit.map(s =>
+      `<button data-i="${SPOTS.indexOf(s)}">${s.t==="dogrun"?"🐕":"☕"} ${esc(s.n)}<small>🐶 ${esc(dogText(s))}　${esc(s.a||"")}</small></button>`).join("")
       : `<button disabled>見つかりませんでした</button>`;
     res.style.display = "block";
   });
@@ -257,35 +262,35 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
   $("#aboutClose").addEventListener("click", () => $("#about").classList.remove("open"));
   $("#about").addEventListener("click", e => { if (e.target.id === "about") $("#about").classList.remove("open"); });
 
-  // ---- 詳細パネル ----
   const panel = $("#panel");
-  // 検索はお店の名前だけで行う（地名などを足すと、別のお店が混ざるため）。
-  // 名前の登録がない所や、店名だけでは店舗を特定できない所（チェーン店・「ドッグカフェ」だけ等）は検索ボタンを出さない
-  const GENERIC = /^(ドッグカフェ|犬カフェ|ドッグラン|カフェ|スターバックス.*|ドトール.*|タリーズ.*|コメダ.*)$/;
+
+  // ---- 埋め込み用の公式スクリプト（必要になった時だけ読み込む） ----
+  function loadScript(src){
+    if (document.querySelector(`script[src="${src}"]`)) return;
+    const sc = document.createElement("script"); sc.async = true; sc.src = src; document.body.appendChild(sc);
+  }
+  function renderEmbeds(){
+    if (panel.querySelector(".instagram-media")){
+      if (window.instgrm) window.instgrm.Embeds.process();
+      else loadScript("https://www.instagram.com/embed.js");
+    }
+    if (panel.querySelector(".twitter-tweet")){
+      if (window.twttr && window.twttr.widgets) window.twttr.widgets.load(panel);
+      else loadScript("https://platform.twitter.com/widgets.js");
+    }
+  }
+
+  // ---- 詳細パネル ----
+  // もっと探す時は、お店の名前だけで検索する（地名などを足すと別のお店が混ざるため）
   function searchNames(s){
-    if (s.noname || GENERIC.test(s.n.trim())) return [];
     const main = s.n.replace(/[（(].*?[）)]/g, "").trim();
     const inner = ((s.n.match(/[（(]([^）)]+)[）)]/) || [])[1] || "").trim();
     return [...new Set([main, inner].filter(n => n.length >= 2))];
   }
-  function tagWord(s){
-    if (s.noname) return null;
-    // 「GROUND ROCK CASTLE（グランドロックキャッスル）」のように括弧内がカナなら、そちらをタグにする
-    const inner = (s.n.match(/[（(]([^）)]*[ァ-ヶ][^）)]*)[）)]/) || [])[1];
-    const t = (inner || s.n.replace(/[（(].*?[）)]/g, "")).replace(/[\s　&＆・\-－'’.!！]/g, "");
-    return t.length >= 2 ? t : null;
-  }
-  let igLoaded = false;
-  function loadInstagram(){
-    if (window.instgrm){ window.instgrm.Embeds.process(); return; }
-    if (igLoaded) return; igLoaded = true;
-    const sc = document.createElement("script"); sc.async = true; sc.src = "https://www.instagram.com/embed.js";
-    document.body.appendChild(sc);
-  }
 
   // スマホでは下の詳細欄に隠れないよう、目印を画面上側に寄せる
   function focus(s, zoom){
-    const z = zoom || Math.max(map.getZoom(), 8);
+    const z = zoom || Math.max(map.getZoom(), 12);
     const mobile = innerWidth <= 760;
     const dy = mobile ? innerHeight * 0.5 - (150 + innerHeight * 0.36) / 2 : 0;
     const dx = mobile ? 0 : -210;
@@ -300,54 +305,57 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
   function open(s, zoom){
     focus(s, zoom);
     const run = s.t === "dogrun";
-    const names = searchNames(s), tag = names.length ? tagWord(s) : null;
     const u = encodeURIComponent;
-    const exact = names.map(n => `"${n}"`).join(" OR ");  // 名前と完全に一致するものだけを探す
-    const ig = tag ? `https://www.instagram.com/explore/tags/${u(tag)}/`
-                   : `https://www.google.com/search?q=${u("site:instagram.com " + exact)}`;
+    const names = searchNames(s), exact = names.map(n => `"${n}"`).join(" OR ");
+    const igAcc = s.ig ? (s.ig.startsWith("http") ? s.ig : "https://www.instagram.com/" + s.ig.replace("@","")) : null;
+
     const links = [];
     if (s.web) links.push(`<a href="${esc(s.web)}" target="_blank" rel="noopener">🌐 公式サイト</a>`);
-    if (s.ig) links.push(`<a href="${esc(s.ig.startsWith("http")?s.ig:"https://www.instagram.com/"+s.ig.replace("@",""))}" target="_blank" rel="noopener">📷 公式Instagram</a>`);
     if (s.x) links.push(`<a href="${esc(s.x)}" target="_blank" rel="noopener">𝕏 公式X</a>`);
-    links.push(`<a href="https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}" target="_blank" rel="noopener">🧭 道順（Googleマップ）</a>`);
+    links.push(`<a href="https://www.google.com/maps/search/?api=1&query=${u(s.n + " " + (s.a||""))}" target="_blank" rel="noopener">🧭 道順（Googleマップ）</a>`);
 
-    const media = (s.media||[]);
+    const media = s.media || [];
+    const igs = media.filter(m => m.kind === "instagram").map(m =>
+      `<div class="ig"><blockquote class="instagram-media" data-instgrm-permalink="${esc(m.url)}?utm_source=ig_embed" data-instgrm-version="14">
+        <a href="${esc(m.url)}" target="_blank" rel="noopener">Instagramで看板犬の投稿を見る</a></blockquote></div>`).join("");
     const yts = media.filter(m => m.kind === "youtube").map(m =>
       `<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(m.id)}?rel=0" title="${esc(m.title||"YouTube動画")}" loading="lazy"
         allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
        <p class="ytt">${esc(m.title||"")}</p>`).join("");
-    const igs = media.filter(m => m.kind === "instagram").map(m =>
-      `<div class="ig"><blockquote class="instagram-media" data-instgrm-permalink="${esc(m.url)}?utm_source=ig_embed" data-instgrm-version="14">
-        <a href="${esc(m.url)}" target="_blank" rel="noopener">Instagramで投稿を見る</a></blockquote></div>`).join("");
+    const xs = media.filter(m => m.kind === "x").map(m =>
+      `<div class="xp"><blockquote class="twitter-tweet" data-lang="ja" data-dnt="true"><a href="${esc(m.url.replace("//x.com", "//twitter.com"))}">Xで投稿を見る</a></blockquote></div>`).join("");
+
+    const dogs = (s.dogs||[]).map(d => `<span class="dog">🐶 <b>${esc(d.name)}</b>${d.breed?`<small>${esc(d.breed)}</small>`:""}</span>`).join("");
 
     panel.innerHTML = `
       <div class="ph">
         <button class="iconbtn close" aria-label="閉じる">✕</button>
-        <span class="kind ${run?"run":"cafe"}">${run?"🐕 ドッグラン":(s.ok?"☕ 犬連れOKカフェ":"☕ ドッグカフェ")}</span>${s.feat?'<span class="kind star">⭐ 写真・動画あり</span>':""}
+        <span class="kind ${run?"run":"cafe"}">${run?"🐕 ドッグラン":"☕ ドッグカフェ"}</span>
         <h2>${esc(s.n)}</h2>
         <div class="addr">${esc(s.a||"")}</div>
       </div>
       <div class="pb">
+        <div class="dogs"><div class="dl">看板犬</div>${dogs || '<span class="dog">🐶</span>'}</div>
         ${s.note?`<p class="note">${esc(s.note)}</p>`:""}
-        ${s.hours?`<p class="meta">🕒 営業時間（登録情報）：${esc(s.hours)}</p>`:""}
-        ${s.noname?`<p class="meta">※ 地図データに施設名の登録がないため、地名で表示しています。</p>`:""}
+        ${igs||yts||xs ? `<h3>📸 看板犬の写真・動画</h3>${igs}${yts}${xs}`
+          : `<p class="hint" style="margin-bottom:12px">アプリ内で表示できる投稿が見つからなかったため、お店の公式アカウントからご覧ください。</p>`}
+        ${igAcc?`<a class="bigig" href="${esc(igAcc)}" target="_blank" rel="noopener">📷 公式Instagramで看板犬をもっと見る</a>`:""}
         <div class="links">${links.join("")}</div>
-        ${yts?`<h3>🎬 わんちゃんの動画</h3>${yts}`:""}
-        ${igs?`<h3>📷 Instagramの投稿</h3>${igs}`:""}
-        <h3>🔎 ${media.length?"もっと写真・動画を探す":"わんちゃんの写真・動画を探す"}</h3>
-        ${names.length ? `<div class="sbtns">
-          <a class="s-ig" href="${ig}" target="_blank" rel="noopener">📷 Instagram</a>
-          <a class="s-x" href="https://x.com/search?q=${u(exact)}&f=media" target="_blank" rel="noopener">𝕏 X</a>
-          <a class="s-yt" href="https://www.youtube.com/results?search_query=${u(`"${names[0]}"`)}" target="_blank" rel="noopener">▶ YouTube</a>
-          <a class="s-gg" href="https://www.google.com/search?tbm=isch&q=${u(exact)}" target="_blank" rel="noopener">🖼 画像検索</a>
-        </div>
-        <p class="hint">お店の名前「${names.map(esc).join("」「")}」で検索します。${tag?`Instagramはハッシュタグ #${esc(tag)} を開きます。`:""}<br>InstagramとXは、ログインしていないと検索結果が表示されないことがあります。</p>`
-        : `<p class="hint">${s.noname?"施設名の登録がないため":"店名だけでは店舗を特定できないため"}、別のお店が混ざらないよう検索ボタンは表示していません。「道順（Googleマップ）」から、この場所の写真をご覧いただけることがあります。</p>`}
+        <details class="more"><summary>🔎 お店の名前で写真・動画を探す</summary>
+          <div class="sbtns">
+            <a class="s-x" href="https://x.com/search?q=${u(exact)}&f=media" target="_blank" rel="noopener">𝕏 X</a>
+            <a class="s-yt" href="https://www.youtube.com/results?search_query=${u(`"${names[0]}"`)}" target="_blank" rel="noopener">▶ YouTube</a>
+            <a class="s-gg" href="https://www.google.com/search?tbm=isch&q=${u(exact)}" target="_blank" rel="noopener">🖼 画像検索</a>
+            <a class="s-ig" href="https://www.google.com/search?q=${u("site:instagram.com " + exact)}" target="_blank" rel="noopener">📷 Instagram</a>
+          </div>
+          <p class="hint">お店の名前「${names.map(esc).join("」「")}」と完全に一致するものを探します。</p>
+        </details>
+        ${s.src?`<p class="src">看板犬の情報の出典：<a href="${esc(s.src)}" target="_blank" rel="noopener">${esc(s.src.replace(/^https?:\/\//,"").slice(0,48))}</a></p>`:""}
       </div>`;
     panel.classList.add("open");
     panel.scrollTop = 0;
     panel.querySelector(".close").addEventListener("click", close);
-    if (igs) loadInstagram();
+    renderEmbeds();
   }
   function close(){
     panel.classList.remove("open");
