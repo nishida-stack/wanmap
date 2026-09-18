@@ -285,8 +285,12 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
     const mobile = innerWidth <= 760;
     const dy = mobile ? innerHeight * 0.5 - (150 + innerHeight * 0.36) / 2 : 0;
     const dx = mobile ? 0 : -210;
-    const pt = map.project([s.lat, s.lng], z).add([-dx, dy]);
-    map.flyTo(map.unproject(pt, z), z, {duration: .6});
+    try {
+      const pt = map.project([s.lat, s.lng], z).add([-dx, dy]);
+      map.flyTo(map.unproject(pt, z), z, {duration: .6});
+    } catch (e) {
+      map.setView([s.lat, s.lng], z, {animate: false}); // 画面の大きさが取れない時など
+    }
   }
 
   function open(s, zoom){
