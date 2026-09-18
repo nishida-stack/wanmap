@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>わんマップ</title>
+<title>わんカフェわんランマップ</title>
 <meta name="description" content="全国のドッグラン・ドッグカフェを地図で探して、わんちゃんの写真・動画を見られるマップ">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
@@ -120,7 +120,7 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
 <div id="top">
   <div class="bar">
     <div class="row1">
-      <div class="logo">🐾<span> わんマップ</span></div>
+      <div class="logo">🐾<span> わんカフェわんランマップ</span></div>
       <div class="search">
         <input id="q" type="search" placeholder="施設名・地名で探す（例：京都、グランドロック）" autocomplete="off" aria-label="施設名・地名で探す">
         <div id="results" role="listbox"></div>
@@ -141,7 +141,7 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
 
 <div id="about" role="dialog" aria-modal="true" aria-label="このアプリについて">
   <div class="box">
-    <h2>🐾 わんマップについて</h2>
+    <h2>🐾 わんカフェわんランマップについて</h2>
     <div class="legend">
       <span><i class="dot" style="background:var(--run)"></i>ドッグラン</span>
       <span><i class="dot" style="background:var(--cafe)"></i>ドッグカフェ・犬連れOKカフェ</span>
@@ -259,10 +259,14 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
 
   // ---- 詳細パネル ----
   const panel = $("#panel");
-  function searchWord(s){
-    let base = s.noname ? `${s.area||""} ドッグラン` : s.n.replace(/[（(].*?[）)]/g, "").trim();
-    if (!s.noname && (s.ok || base.length <= 6) && s.area) base += " " + s.area;
-    return base;
+  // 検索はお店の名前だけで行う（地名などを足すと、別のお店が混ざるため）。
+  // 名前の登録がない所や、店名だけでは店舗を特定できない所（チェーン店・「ドッグカフェ」だけ等）は検索ボタンを出さない
+  const GENERIC = /^(ドッグカフェ|犬カフェ|ドッグラン|カフェ|スターバックス.*|ドトール.*|タリーズ.*|コメダ.*)$/;
+  function searchNames(s){
+    if (s.noname || GENERIC.test(s.n.trim())) return [];
+    const main = s.n.replace(/[（(].*?[）)]/g, "").trim();
+    const inner = ((s.n.match(/[（(]([^）)]+)[）)]/) || [])[1] || "").trim();
+    return [...new Set([main, inner].filter(n => n.length >= 2))];
   }
   function tagWord(s){
     if (s.noname) return null;
@@ -296,10 +300,11 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
   function open(s, zoom){
     focus(s, zoom);
     const run = s.t === "dogrun";
-    const w = searchWord(s), tag = tagWord(s);
+    const names = searchNames(s), tag = names.length ? tagWord(s) : null;
     const u = encodeURIComponent;
+    const exact = names.map(n => `"${n}"`).join(" OR ");  // 名前と完全に一致するものだけを探す
     const ig = tag ? `https://www.instagram.com/explore/tags/${u(tag)}/`
-                   : `https://www.google.com/search?q=${u("site:instagram.com " + w)}`;
+                   : `https://www.google.com/search?q=${u("site:instagram.com " + exact)}`;
     const links = [];
     if (s.web) links.push(`<a href="${esc(s.web)}" target="_blank" rel="noopener">🌐 公式サイト</a>`);
     if (s.ig) links.push(`<a href="${esc(s.ig.startsWith("http")?s.ig:"https://www.instagram.com/"+s.ig.replace("@",""))}" target="_blank" rel="noopener">📷 公式Instagram</a>`);
@@ -330,13 +335,14 @@ h3{font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
         ${yts?`<h3>🎬 わんちゃんの動画</h3>${yts}`:""}
         ${igs?`<h3>📷 Instagramの投稿</h3>${igs}`:""}
         <h3>🔎 ${media.length?"もっと写真・動画を探す":"わんちゃんの写真・動画を探す"}</h3>
-        <div class="sbtns">
+        ${names.length ? `<div class="sbtns">
           <a class="s-ig" href="${ig}" target="_blank" rel="noopener">📷 Instagram</a>
-          <a class="s-x" href="https://x.com/search?q=${u(w)}&f=media" target="_blank" rel="noopener">𝕏 X</a>
-          <a class="s-yt" href="https://www.youtube.com/results?search_query=${u(w + (run?"":" 犬"))}" target="_blank" rel="noopener">▶ YouTube</a>
-          <a class="s-gg" href="https://www.google.com/search?tbm=isch&q=${u(w + " 犬")}" target="_blank" rel="noopener">🖼 画像検索</a>
+          <a class="s-x" href="https://x.com/search?q=${u(exact)}&f=media" target="_blank" rel="noopener">𝕏 X</a>
+          <a class="s-yt" href="https://www.youtube.com/results?search_query=${u(`"${names[0]}"`)}" target="_blank" rel="noopener">▶ YouTube</a>
+          <a class="s-gg" href="https://www.google.com/search?tbm=isch&q=${u(exact)}" target="_blank" rel="noopener">🖼 画像検索</a>
         </div>
-        <p class="hint">検索キーワード：「${esc(w)}」${tag?`／Instagramはハッシュタグ #${esc(tag)}`:""}<br>InstagramとXは、ログインしていないと検索結果が表示されないことがあります。</p>
+        <p class="hint">お店の名前「${names.map(esc).join("」「")}」で検索します。${tag?`Instagramはハッシュタグ #${esc(tag)} を開きます。`:""}<br>InstagramとXは、ログインしていないと検索結果が表示されないことがあります。</p>`
+        : `<p class="hint">${s.noname?"施設名の登録がないため":"店名だけでは店舗を特定できないため"}、別のお店が混ざらないよう検索ボタンは表示していません。「道順（Googleマップ）」から、この場所の写真をご覧いただけることがあります。</p>`}
       </div>`;
     panel.classList.add("open");
     panel.scrollTop = 0;
